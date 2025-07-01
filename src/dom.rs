@@ -11,10 +11,33 @@ pub fn Node(attributes: Vec<(String, String)>, children: Vec<Node>) -> Node {
     }
 }
 
-pub fn Leaf(value: String) -> Node {
-    Node {
-        attributes: vec![("value".to_string(), value)],
-        children: vec![],
+impl fmt::Display for Node {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fn print_node(node: &Node, f: &mut fmt::Formatter<'_>, indent: usize) -> fmt::Result {
+            let indent_str = "  ".repeat(indent);
+            match &node.tag {
+                Some(tag) => write!(f, "{}{}:", indent_str, tag)?,
+                None => write!(f, "{}Text:", indent_str)?,
+            }
+
+            if !node.attributes.is_empty() {
+                write!(f, " [")?;
+                for (i, (key, value)) in node.attributes.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    write!(f, "{}=\"{}\"", key, value)?;
+                }
+                write!(f, "]")?;
+            }
+            writeln!(f)?;
+
+            for child in &node.children {
+                print_node(child, f, indent + 1)?;
+            }
+            Ok(())
+        }
+        print_node(self, f, 0)
     }
 }
 
