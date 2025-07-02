@@ -69,22 +69,33 @@ fn parse(input: &str) -> Node {
                     attributes.push((key.to_string(), value.trim_matches('"').to_string()));
                 }
             }
-            let child = Node {
-                attributes,
-                children: vec![],
-            };
+            let child = Node::new(Some(tag_name), attributes, vec![]);
             root.children.push(child);
         } else {
-            // Accumulate text content
             text_content.push_str(part);
             text_content.push(' ');
         }
     }
 
-    // Add any remaining text content as a leaf
     if !text_content.is_empty() {
-        root.children.push(Leaf(text_content.trim().to_string()));
+        root.children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
     }
 
     root
+}
+
+pub fn main() {
+    let input = r#"<html lang="en">
+        <head>
+            <title>My Web Page</title>
+        </head>
+        <body>
+            <h1>Welcome to my web page</h1>
+            <p>This is a paragraph with <a href="https://www.example.com">a link</a>.</p>
+        </body>
+    </html>"#;
+
+    let parsed_tree = parse(input);
+    println!("Parsed DOM Tree:");
+    println!("{}", parsed_tree);
 }
