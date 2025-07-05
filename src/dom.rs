@@ -49,31 +49,41 @@ impl fmt::Display for Node {
 fn parse(input: &str) -> Node {
     let mut root = Node::new(vec![], vec![]);
     let mut text_content = String::new();
-    let mut parts = input.split_whitespace().peekable();
+    let mut chars = input.chars().peekable();
 
-    while let Some(part) = parts.next() {
-        if part.starts_with('<') && part.ends_with('>') {
+    while let Some(c) = chars.next() {
+        if c == '<' {
             if !text_content.is_empty() {
                 root.children.push(Node::new(vec![("value".to_string(), text_content.trim().to_string())], vec![]));
                 text_content.clear();
             }
 
-            let tag_name = part[1..part.len() - 1].to_string();
-            let mut attributes = vec![];
-            while let Some(attr) = parts.next() {
-                if attr == ">" {
+            let mut tag = String::new();
+            while let Some(&next_c) = chars.peek() {
+                if next_c.is_whitespace() || next_c == '>' {
                     break;
                 }
-                let mut attr_parts = attr.split('=');
-                if let (Some(key), Some(value)) = (attr_parts.next(), attr_parts.next()) {
-                    attributes.push((key.to_string(), value.trim_matches('"').to_string()));
-                }
+                tag.push(chars.next().unwrap());
             }
+
+            let mut attributes = vec![];
+            while let Some(&next_c) = chars.peek() {
+                if next_c == '>' {
+                    chars.next();
+                    break;
+                }
+                if next_c.is_whitespace() {
+                    chars.next();
+                    continue;
+                }
+                let (key, value) = parse_attribute(&mut chars);
+                attributes.push((key, value));
+            }
+
             let child = Node::new(attributes, vec![]);
             root.children.push(child);
         } else {
-            text_content.push_str(part);
-            text_content.push(' ');
+            text_content.push(c);
         }
     }
 
@@ -82,6 +92,44 @@ fn parse(input: &str) -> Node {
     }
 
     root
+}
+
+fn parse_attribute(chars: &mut std::iter::Peekable<std::str::Chars>) -> (String, String) {
+    let mut key = String::new();
+    let mut value = String::new();
+
+    // Parse key
+    while let Some(&c) = chars.peek() {
+        if c == '=' {
+            chars.next();
+            break;
+        }
+        key.push(chars.next().unwrap());
+    }
+
+    // Parse value
+    if let Some(&quote) = chars.peek() {
+        if quote == '"' || quote == '\'' {
+            chars.next(); // consume opening quote
+            while let Some(&c) = chars.peek() {
+                if c == quote {
+                    chars.next(); // consume closing quote
+                    break;
+                }
+                value.push(chars.next().unwrap());
+            }
+        } else {
+            // Unquoted value
+            while let Some(&c) = chars.peek() {
+                if c.is_whitespace() || c == '>' {
+                    break;
+                }
+                value.push(chars.next().unwrap());
+            }
+        }
+    }
+
+    (key.trim().to_string(), value.to_string())
 }
 
 pub fn main() {
