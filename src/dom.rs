@@ -2,13 +2,15 @@ use std::fmt;
 
 #[derive(Debug)]
 struct Node {
+    tag: Option<String>,
     attributes: Vec<(String, String)>,
     children: Vec<Node>
 }
 
 impl Node {
-    fn new(attributes: Vec<(String, String)>, children: Vec<Node>) -> Self {
+    fn new(tag: Option<String>, attributes: Vec<(String, String)>, children: Vec<Node>) -> Self {
         Node {
+            tag,
             attributes,
             children,
         }
@@ -19,11 +21,10 @@ impl fmt::Display for Node {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fn print_node(node: &Node, f: &mut fmt::Formatter<'_>, indent: usize) -> fmt::Result {
             let indent_str = "  ".repeat(indent);
-            // match &node.tag {
-            //     Some(tag) => write!(f, "{}{}:", indent_str, tag)?,
-                // None => write!(f, "{}Text:", indent_str)?,
-            // }
-            write!(f, "{}", indent_str)?;
+            match &node.tag {
+                Some(tag) => write!(f, "{}{}:", indent_str, tag)?,
+                None => write!(f, "{}Text:", indent_str)?,
+            }
 
             if !node.attributes.is_empty() {
                 write!(f, " [")?;
@@ -47,14 +48,14 @@ impl fmt::Display for Node {
 }
 
 fn parse(input: &str) -> Node {
-    let mut root = Node::new(vec![], vec![]);
+    let mut root = Node::new(None, vec![], vec![]);
     let mut text_content = String::new();
     let mut chars = input.chars().peekable();
 
     while let Some(c) = chars.next() {
         if c == '<' {
             if !text_content.is_empty() {
-                root.children.push(Node::new(vec![("value".to_string(), text_content.trim().to_string())], vec![]));
+                root.children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
                 text_content.clear();
             }
 
@@ -80,7 +81,7 @@ fn parse(input: &str) -> Node {
                 attributes.push((key, value));
             }
 
-            let child = Node::new(attributes, vec![]);
+            let child = Node::new(Some(tag), attributes, vec![]);
             root.children.push(child);
         } else {
             text_content.push(c);
@@ -88,7 +89,7 @@ fn parse(input: &str) -> Node {
     }
 
     if !text_content.is_empty() {
-        root.children.push(Node::new(vec![("value".to_string(), text_content.trim().to_string())], vec![]));
+        root.children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
     }
 
     root
