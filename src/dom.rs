@@ -88,7 +88,7 @@ fn parse(input: &str) -> Node {
         }
     }
 
-    if !text_content.is_empty() {
+    if !text_content.trim().is_empty() {
         root.children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
     }
 
