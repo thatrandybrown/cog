@@ -55,7 +55,7 @@ fn parse(input: &str) -> Node {
     while let Some(c) = chars.next() {
         if c == '<' {
             if !text_content.trim().is_empty() {
-                root.children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
+                root.as_mut().unwrap().children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
                 text_content.clear();
             }
 
@@ -94,7 +94,7 @@ fn parse(input: &str) -> Node {
     }
 
     if !text_content.trim().is_empty() {
-        root.children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
+        root.as_mut().unwrap().children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
     }
 
     root.unwrap_or(Node::new(None, vec![], vec![]))
