@@ -67,6 +67,18 @@ fn parse(input: &str) -> Node {
                 tag.push(chars.next().unwrap());
             }
 
+            if tag.starts_with('/') {
+                // consume to the end of the tag
+                while let Some(&next_c) = chars.peek() {
+                    if next_c == '>' {
+                        chars.next();
+                        break;
+                    }
+                    chars.next();
+                }
+                continue;
+            }
+
             let mut attributes = vec![];
             while let Some(&next_c) = chars.peek() {
                 if next_c == '>' {
