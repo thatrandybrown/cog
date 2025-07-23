@@ -4,7 +4,8 @@ use std::fmt;
 struct Node {
     tag: Option<String>,
     attributes: Vec<(String, String)>,
-    children: Vec<Node>
+    children: Vec<Node>,
+    parent: Option<Box<Node>>,
 }
 
 impl Node {
@@ -13,6 +14,7 @@ impl Node {
             tag,
             attributes,
             children,
+            parent: None,
         }
     }
 }
