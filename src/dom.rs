@@ -51,6 +51,7 @@ impl fmt::Display for Node {
 
 fn parse(input: &str) -> Node {
     let mut root: Option<Node> = None;
+    let mut current = &root;
     let mut text_content = String::new();
     let mut chars = input.chars().peekable();
 
@@ -64,6 +65,8 @@ fn parse(input: &str) -> Node {
             let mut tag = String::new();
             while let Some(&next_c) = chars.peek() {
                 if next_c.is_whitespace() || next_c == '>' {
+                    // opening tag found
+                    // set tag to root node
                     break;
                 }
                 tag.push(chars.next().unwrap());
@@ -95,11 +98,12 @@ fn parse(input: &str) -> Node {
                 attributes.push((key, value));
             }
 
-            let child = Node::new(Some(tag), attributes, vec![]);
+            let mut child = Node::new(Some(tag), attributes, vec![]);
             // if root is not initialized, initialize it
             if root.is_none() {
                 root = Some(child);
             } else {
+                child.parent = Some(Box::new(root.as_ref().unwrap()));
                 root.as_mut().unwrap().children.push(child);
             }
         } else {
