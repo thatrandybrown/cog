@@ -1,11 +1,14 @@
+use std::rc::{Rc, Weak};
+use std::cell::RefCell;
+
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Node {
     tag: Option<String>,
     attributes: Vec<(String, String)>,
     children: Vec<Node>,
-    parent: Option<Box<Node>>,
+    parent: Option<Weak<RefCell<Node>>>,
 }
 
 impl Node {
@@ -103,7 +106,7 @@ fn parse(input: &str) -> Node {
             if root.is_none() {
                 root = Some(child);
             } else {
-                child.parent = Some(Box::new(root.as_ref().unwrap()));
+                child.parent = Some(Rc::downgrade(&Rc::new(RefCell::new(root.clone().unwrap()))));
                 root.as_mut().unwrap().children.push(child);
             }
         } else {
