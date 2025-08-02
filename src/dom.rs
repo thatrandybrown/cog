@@ -53,15 +53,14 @@ impl fmt::Display for Node {
 }
 
 fn parse(input: &str) -> Node {
-    let mut root: Option<Node> = None;
-    let mut current = &root;
+    let mut root: Option<Rc<RefCell<Node>>> = None;
     let mut text_content = String::new();
     let mut chars = input.chars().peekable();
 
     while let Some(c) = chars.next() {
         if c == '<' {
             if !text_content.trim().is_empty() {
-                root.as_mut().unwrap().children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
+                root.as_ref().unwrap().borrow_mut().children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
                 text_content.clear();
             }
 
@@ -101,13 +100,14 @@ fn parse(input: &str) -> Node {
                 attributes.push((key, value));
             }
 
-            let mut child = Node::new(Some(tag), attributes, vec![]);
+            let mut child = Rc::new(RefCell::new(Node::new(Some(tag), attributes, vec![])));
             // if root is not initialized, initialize it
             if root.is_none() {
                 root = Some(child);
             } else {
-                child.parent = Some(Rc::downgrade(&Rc::new(RefCell::new(root.clone().unwrap()))));
-                root.as_mut().unwrap().children.push(child);
+                child.borrow_mut().parent = Some(Rc::downgrade(root.as_ref().unwrap()));
+                // child.borrow_mut().parent = Some(Rc::downgrade(&root));
+                root.as_ref().unwrap().borrow_mut().children.push(Rc::try_unwrap(child).expect("Failed to unwrap Rc").into_inner());
             }
         } else {
             text_content.push(c);
@@ -115,10 +115,15 @@ fn parse(input: &str) -> Node {
     }
 
     if !text_content.trim().is_empty() {
-        root.as_mut().unwrap().children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
+        root.as_ref().unwrap().borrow_mut().children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
     }
 
-    root.unwrap_or(Node::new(None, vec![], vec![]))
+    match root {
+        Some(rc_node) => Rc::try_unwrap(rc_node)
+            .expect("Failed to unwrap Rc")
+            .into_inner(),
+        None => Node::new(None, vec![], vec![])
+    }
 }
 
 fn parse_attribute(chars: &mut std::iter::Peekable<std::str::Chars>) -> (String, String) {
