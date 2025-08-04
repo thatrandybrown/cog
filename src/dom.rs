@@ -54,6 +54,7 @@ impl fmt::Display for Node {
 
 fn parse(input: &str) -> Node {
     let mut root: Option<Rc<RefCell<Node>>> = None;
+    let mut current: Option<Rc<RefCell<Node>>> = None;
     let mut text_content = String::new();
     let mut chars = input.chars().peekable();
 
@@ -104,6 +105,7 @@ fn parse(input: &str) -> Node {
             // if root is not initialized, initialize it
             if root.is_none() {
                 root = Some(child);
+                current = root.clone();
             } else {
                 child.borrow_mut().parent = Some(Rc::downgrade(root.as_ref().unwrap()));
                 // child.borrow_mut().parent = Some(Rc::downgrade(&root));
@@ -118,6 +120,7 @@ fn parse(input: &str) -> Node {
         root.as_ref().unwrap().borrow_mut().children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
     }
 
+    drop(current); // Drop current to avoid holding onto the last node
     match root {
         Some(rc_node) => Rc::try_unwrap(rc_node)
             .expect("Failed to unwrap Rc")
