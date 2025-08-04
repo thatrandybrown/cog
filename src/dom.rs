@@ -61,7 +61,7 @@ fn parse(input: &str) -> Node {
     while let Some(c) = chars.next() {
         if c == '<' {
             if !text_content.trim().is_empty() {
-                root.as_ref().unwrap().borrow_mut().children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
+                current.as_ref().unwrap().borrow_mut().children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
                 text_content.clear();
             }
 
@@ -107,9 +107,9 @@ fn parse(input: &str) -> Node {
                 root = Some(child);
                 current = root.clone();
             } else {
-                child.borrow_mut().parent = Some(Rc::downgrade(root.as_ref().unwrap()));
+                child.borrow_mut().parent = Some(Rc::downgrade(current.as_ref().unwrap()));
                 // child.borrow_mut().parent = Some(Rc::downgrade(&root));
-                root.as_ref().unwrap().borrow_mut().children.push(Rc::try_unwrap(child).expect("Failed to unwrap Rc").into_inner());
+                current.as_ref().unwrap().borrow_mut().children.push(Rc::try_unwrap(child).expect("Failed to unwrap Rc").into_inner());
             }
         } else {
             text_content.push(c);
@@ -117,7 +117,7 @@ fn parse(input: &str) -> Node {
     }
 
     if !text_content.trim().is_empty() {
-        root.as_ref().unwrap().borrow_mut().children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
+        current.as_ref().unwrap().borrow_mut().children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
     }
 
     drop(current); // Drop current to avoid holding onto the last node
