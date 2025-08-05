@@ -7,12 +7,12 @@ use std::fmt;
 struct Node {
     tag: Option<String>,
     attributes: Vec<(String, String)>,
-    children: Vec<Node>,
+    children: Vec<Rc<RefCell<Node>>>,
     parent: Option<Weak<RefCell<Node>>>,
 }
 
 impl Node {
-    fn new(tag: Option<String>, attributes: Vec<(String, String)>, children: Vec<Node>) -> Self {
+    fn new(tag: Option<String>, attributes: Vec<(String, String)>, children: Vec<Rc<RefCell<Node>>>) -> Self {
         Node {
             tag,
             attributes,
@@ -44,7 +44,7 @@ impl fmt::Display for Node {
             writeln!(f)?;
 
             for child in &node.children {
-                print_node(child, f, indent + 1)?;
+                print_node(&child.borrow(), f, indent + 1)?;
             }
             Ok(())
         }
@@ -61,7 +61,7 @@ fn parse(input: &str) -> Node {
     while let Some(c) = chars.next() {
         if c == '<' {
             if !text_content.trim().is_empty() {
-                current.as_ref().unwrap().borrow_mut().children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
+                current.as_ref().unwrap().borrow_mut().children.push(Rc::new(RefCell::new(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]))));
                 text_content.clear();
             }
 
@@ -101,7 +101,8 @@ fn parse(input: &str) -> Node {
                 attributes.push((key, value));
             }
 
-            let mut child = Rc::new(RefCell::new(Node::new(Some(tag), attributes, vec![])));
+            let node = Node::new(Some(tag), attributes, vec![]);
+            let child = Rc::new(RefCell::new(node));
             // if root is not initialized, initialize it
             if root.is_none() {
                 root = Some(child);
@@ -109,7 +110,8 @@ fn parse(input: &str) -> Node {
             } else {
                 child.borrow_mut().parent = Some(Rc::downgrade(current.as_ref().unwrap()));
                 // child.borrow_mut().parent = Some(Rc::downgrade(&root));
-                current.as_ref().unwrap().borrow_mut().children.push(Rc::try_unwrap(child).expect("Failed to unwrap Rc").into_inner());
+                current.as_ref().unwrap().borrow_mut().children.push(child.clone());
+                current = Some(child);
             }
         } else {
             text_content.push(c);
@@ -117,7 +119,7 @@ fn parse(input: &str) -> Node {
     }
 
     if !text_content.trim().is_empty() {
-        current.as_ref().unwrap().borrow_mut().children.push(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]));
+        current.as_ref().unwrap().borrow_mut().children.push(Rc::new(RefCell::new(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]))));
     }
 
     drop(current); // Drop current to avoid holding onto the last node
