@@ -3,7 +3,7 @@ use std::cell::RefCell;
 
 use std::fmt;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 struct Node {
     tag: Option<String>,
     attributes: Vec<(String, String)>,
