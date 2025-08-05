@@ -76,6 +76,15 @@ fn parse(input: &str) -> Node {
             }
 
             if tag.starts_with('/') {
+                // closing tag - move up to parent
+                if let Some(current_node) = &current {
+                    let parent_rc = current_node.borrow().parent.as_ref()
+                        .and_then(|parent_weak| parent_weak.upgrade());
+
+                    if let Some(parent) = parent_rc {
+                        current = Some(parent);
+                    }
+                }
                 // consume to the end of the tag
                 while let Some(&next_c) = chars.peek() {
                     if next_c == '>' {
