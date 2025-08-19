@@ -179,17 +179,13 @@ fn parse_attribute(chars: &mut std::iter::Peekable<std::str::Chars>) -> (String,
 }
 
 pub fn main() {
-    let input = r#"<html lang="en">
-        <head>
-            <title>My Web Page</title>
-        </head>
-        <body>
-            <h1>Welcome to my web page</h1>
-            <p>This is a paragraph with <a href="https://www.example.com">a link</a>.</p>
-        </body>
-    </html>"#;
+    let args: Vec<String> = std::env::args().collect();
 
-    let parsed_tree = parse(input);
-    println!("Parsed DOM Tree:");
+    if args.len() < 2 {
+        eprintln!("Usage: {} <html_input>", args[0]);
+        return;
+    }
+
+    let parsed_tree = parse(args[1].as_str());
     println!("{}", parsed_tree);
 }
