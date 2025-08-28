@@ -3,6 +3,20 @@ use std::cell::RefCell;
 
 use std::fmt;
 
+struct Stylesheet {
+    rules: Vec<Rule>,
+}
+
+struct Rule {
+    selector: String,
+    declarations: Vec<Declaration>,
+}
+
+struct Declaration {
+    property: String,
+    value: String,
+}
+
 #[derive(Debug)]
 struct Node {
     tag: Option<String>,
