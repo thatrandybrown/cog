@@ -201,5 +201,21 @@ pub fn main() {
     }
 
     let parsed_tree = parse(args[1].as_str());
+
+    const CSS: &str = r#"
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            line-height: 1.5;
+        }
+    "#;
+
     println!("{}", parsed_tree);
 }
