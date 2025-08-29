@@ -66,6 +66,44 @@ impl fmt::Display for Node {
     }
 }
 
+fn parse_attribute(chars: &mut std::iter::Peekable<std::str::Chars>) -> (String, String) {
+    let mut key = String::new();
+    let mut value = String::new();
+
+    // Parse key
+    while let Some(&c) = chars.peek() {
+        if c == '=' {
+            chars.next();
+            break;
+        }
+        key.push(chars.next().unwrap());
+    }
+
+    // Parse value
+    if let Some(&quote) = chars.peek() {
+        if quote == '"' || quote == '\'' {
+            chars.next(); // consume opening quote
+            while let Some(&c) = chars.peek() {
+                if c == quote {
+                    chars.next(); // consume closing quote
+                    break;
+                }
+                value.push(chars.next().unwrap());
+            }
+        } else {
+            // Unquoted value
+            while let Some(&c) = chars.peek() {
+                if c.is_whitespace() || c == '>' {
+                    break;
+                }
+                value.push(chars.next().unwrap());
+            }
+        }
+    }
+
+    (key.trim().to_string(), value.to_string())
+}
+
 fn parse(input: &str) -> Node {
     let mut root: Option<Rc<RefCell<Node>>> = None;
     let mut current: Option<Rc<RefCell<Node>>> = None;
@@ -152,44 +190,6 @@ fn parse(input: &str) -> Node {
             .into_inner(),
         None => Node::new(None, vec![], vec![])
     }
-}
-
-fn parse_attribute(chars: &mut std::iter::Peekable<std::str::Chars>) -> (String, String) {
-    let mut key = String::new();
-    let mut value = String::new();
-
-    // Parse key
-    while let Some(&c) = chars.peek() {
-        if c == '=' {
-            chars.next();
-            break;
-        }
-        key.push(chars.next().unwrap());
-    }
-
-    // Parse value
-    if let Some(&quote) = chars.peek() {
-        if quote == '"' || quote == '\'' {
-            chars.next(); // consume opening quote
-            while let Some(&c) = chars.peek() {
-                if c == quote {
-                    chars.next(); // consume closing quote
-                    break;
-                }
-                value.push(chars.next().unwrap());
-            }
-        } else {
-            // Unquoted value
-            while let Some(&c) = chars.peek() {
-                if c.is_whitespace() || c == '>' {
-                    break;
-                }
-                value.push(chars.next().unwrap());
-            }
-        }
-    }
-
-    (key.trim().to_string(), value.to_string())
 }
 
 pub fn main() {
