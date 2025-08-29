@@ -104,7 +104,7 @@ fn parse_attribute(chars: &mut std::iter::Peekable<std::str::Chars>) -> (String,
     (key.trim().to_string(), value.to_string())
 }
 
-fn parse(input: &str) -> Node {
+fn parse_html(input: &str) -> Node {
     let mut root: Option<Rc<RefCell<Node>>> = None;
     let mut current: Option<Rc<RefCell<Node>>> = None;
     let mut text_content = String::new();
@@ -200,7 +200,7 @@ pub fn main() {
         return;
     }
 
-    let parsed_tree = parse(args[1].as_str());
+    let parsed_tree = parse_html(args[1].as_str());
 
     const CSS: &str = r#"
         body {
