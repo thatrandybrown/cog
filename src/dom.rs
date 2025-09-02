@@ -192,6 +192,11 @@ fn parse_html(input: &str) -> Node {
     }
 }
 
+fn parse_css(input: &str) -> Stylesheet {
+    let mut rules = vec![];
+    Stylesheet { rules }
+}
+
 pub fn main() {
     let args: Vec<String> = std::env::args().collect();
 
