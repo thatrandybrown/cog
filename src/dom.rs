@@ -222,5 +222,7 @@ pub fn main() {
         }
     "#;
 
+    let cssom = parse_css(CSS);
+
     println!("{}", parsed_tree);
 }
