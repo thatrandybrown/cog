@@ -194,6 +194,8 @@ fn parse_html(input: &str) -> Node {
 
 fn parse_css(input: &str) -> Stylesheet {
     let mut rules = vec![];
+    let mut chars = input.chars().peekable();
+
     Stylesheet { rules }
 }
 
