@@ -3,10 +3,12 @@ use std::cell::RefCell;
 
 use std::fmt;
 
+#[derive(Debug)]
 struct Stylesheet {
     rules: Vec<String>,
 }
 
+#[derive(Debug)]
 struct Rule {
     selector: String,
     declarations: String, // Vec<Declaration>,
@@ -243,6 +245,7 @@ pub fn main() {
     "#;
 
     let cssom = parse_css(CSS);
+    println!("{:?}", cssom);
 
     println!("{}", parsed_tree);
 }
