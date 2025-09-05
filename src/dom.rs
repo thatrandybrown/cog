@@ -4,12 +4,12 @@ use std::cell::RefCell;
 use std::fmt;
 
 struct Stylesheet {
-    rules: Vec<Rule>,
+    rules: Vec<String>,
 }
 
 struct Rule {
     selector: String,
-    declarations: Vec<Declaration>,
+    declarations: String, // Vec<Declaration>,
 }
 
 struct Declaration {
@@ -195,6 +195,24 @@ fn parse_html(input: &str) -> Node {
 fn parse_css(input: &str) -> Stylesheet {
     let mut rules = vec![];
     let mut chars = input.chars().peekable();
+    let mut selector = String::new();
+
+    while let Some(c) = chars.next() {
+        if c == '{' {
+            // Start of a new rule
+            let mut rule = String::new();
+            while let Some(&next_c) = chars.peek() {
+                if next_c == '}' {
+                    chars.next();
+                    break;
+                }
+                rule.push(chars.next().unwrap());
+            }
+            rules.push(rule);
+        } else {
+            selector.push(c);
+        }
+    }
 
     Stylesheet { rules }
 }
