@@ -5,13 +5,19 @@ use std::fmt;
 
 #[derive(Debug)]
 struct Stylesheet {
-    rules: Vec<String>,
+    rules: Vec<Rule>,
 }
 
 #[derive(Debug)]
 struct Rule {
     selector: String,
     declarations: String, // Vec<Declaration>,
+}
+
+impl Rule {
+    fn new(selector: String, declarations: String) -> Self {
+        Rule { selector, declarations }
+    }
 }
 
 struct Declaration {
@@ -201,16 +207,15 @@ fn parse_css(input: &str) -> Stylesheet {
 
     while let Some(c) = chars.next() {
         if c == '{' {
-            // Start of a new rule
-            let mut rule = String::new();
+            let mut declaration = String::new();
             while let Some(&next_c) = chars.peek() {
                 if next_c == '}' {
                     chars.next();
                     break;
                 }
-                rule.push(chars.next().unwrap());
+                declaration.push(chars.next().unwrap());
             }
-            rules.push(rule);
+            rules.push(Rule::new(selector.trim().to_string(), declaration.trim().to_string()));
         } else {
             selector.push(c);
         }
