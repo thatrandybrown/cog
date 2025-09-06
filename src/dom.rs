@@ -219,6 +219,7 @@ fn parse_css(input: &str) -> Stylesheet {
                 declaration.push(chars.next().unwrap());
             }
             rules.push(Rule::new(selector.trim().to_string(), declaration.trim().to_string()));
+            selector.clear();
         } else {
             selector.push(c);
         }
