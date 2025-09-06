@@ -212,6 +212,9 @@ fn parse_css(input: &str) -> Stylesheet {
                 if next_c == '}' {
                     chars.next();
                     break;
+                } else if next_c.is_whitespace() {
+                    chars.next();
+                    continue;
                 }
                 declaration.push(chars.next().unwrap());
             }
