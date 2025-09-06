@@ -11,11 +11,11 @@ struct Stylesheet {
 #[derive(Debug)]
 struct Rule {
     selector: String,
-    declarations: String, // Vec<Declaration>,
+    declarations: Vec<String>, // Vec<Declaration>,
 }
 
 impl Rule {
-    fn new(selector: String, declarations: String) -> Self {
+    fn new(selector: String, declarations: Vec<String>) -> Self {
         Rule { selector, declarations }
     }
 }
@@ -218,7 +218,12 @@ fn parse_css(input: &str) -> Stylesheet {
                 }
                 declaration.push(chars.next().unwrap());
             }
-            rules.push(Rule::new(selector.trim().to_string(), declaration.trim().to_string()));
+            // split declaration into list of declarations split at ';'
+            let declarations: Vec<String> = declaration.split(';')
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty())
+                .collect();
+            rules.push(Rule::new(selector.trim().to_string(), declarations));
             selector.clear();
         } else {
             selector.push(c);
