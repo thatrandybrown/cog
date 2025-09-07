@@ -14,12 +14,6 @@ struct Rule {
     declarations: Vec<(String, String)>, // Vec<Declaration>,
 }
 
-impl Rule {
-    fn new(selector: String, declarations: Vec<(String, String)>) -> Self {
-        Rule { selector, declarations }
-    }
-}
-
 struct Declaration {
     property: String,
     value: String,
@@ -31,6 +25,12 @@ struct Node {
     attributes: Vec<(String, String)>,
     children: Vec<Rc<RefCell<Node>>>,
     parent: Option<Weak<RefCell<Node>>>,
+}
+
+impl Rule {
+    fn new(selector: String, declarations: Vec<(String, String)>) -> Self {
+        Rule { selector, declarations }
+    }
 }
 
 impl Node {
