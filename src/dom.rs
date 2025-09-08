@@ -27,12 +27,6 @@ struct Node {
     parent: Option<Weak<RefCell<Node>>>,
 }
 
-impl Rule {
-    fn new(selector: String, declarations: Vec<(String, String)>) -> Self {
-        Rule { selector, declarations }
-    }
-}
-
 impl Node {
     fn new(tag: Option<String>, attributes: Vec<(String, String)>, children: Vec<Rc<RefCell<Node>>>) -> Self {
         Node {
@@ -229,7 +223,7 @@ fn parse_css(input: &str) -> Stylesheet {
                     (key, value)
                 })
                 .collect();
-            rules.push(Rule::new(selector.trim().to_string(), declarations));
+            rules.push(Rule { selector: selector.clone().trim().to_string(), declarations });
             selector.clear();
         } else {
             selector.push(c);
