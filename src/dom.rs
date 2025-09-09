@@ -115,7 +115,7 @@ fn parse_html(input: &str) -> Node {
     while let Some(c) = chars.next() {
         if c == '<' {
             if !text_content.trim().is_empty() {
-                current.as_ref().unwrap().borrow_mut().children.push(Rc::new(RefCell::new(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]))));
+                current.as_ref().unwrap().borrow_mut().children.push(Rc::new(RefCell::new(Node { tag: None, attributes: vec![("value".to_string(), text_content.trim().to_string())], children: vec![], parent: None })));
                 text_content.clear();
             }
 
@@ -164,7 +164,7 @@ fn parse_html(input: &str) -> Node {
                 attributes.push((key, value));
             }
 
-            let node = Node::new(Some(tag), attributes, vec![]);
+            let node = Node { tag: Some(tag), attributes, children: vec![], parent: None };
             let child = Rc::new(RefCell::new(node));
             // if root is not initialized, initialize it
             if root.is_none() {
@@ -182,7 +182,7 @@ fn parse_html(input: &str) -> Node {
     }
 
     if !text_content.trim().is_empty() {
-        current.as_ref().unwrap().borrow_mut().children.push(Rc::new(RefCell::new(Node::new(None, vec![("value".to_string(), text_content.trim().to_string())], vec![]))));
+        current.as_ref().unwrap().borrow_mut().children.push(Rc::new(RefCell::new(Node { tag: None, attributes: vec![("value".to_string(), text_content.trim().to_string())], children: vec![], parent: None })));
     }
 
     drop(current); // Drop current to avoid holding onto the last node
@@ -190,7 +190,7 @@ fn parse_html(input: &str) -> Node {
         Some(rc_node) => Rc::try_unwrap(rc_node)
             .expect("Failed to unwrap Rc")
             .into_inner(),
-        None => Node::new(None, vec![], vec![])
+        None => Node { tag: None, attributes: vec![], children: vec![], parent: None }
     }
 }
 
