@@ -27,17 +27,6 @@ struct Node {
     parent: Option<Weak<RefCell<Node>>>,
 }
 
-impl Node {
-    fn new(tag: Option<String>, attributes: Vec<(String, String)>, children: Vec<Rc<RefCell<Node>>>) -> Self {
-        Node {
-            tag,
-            attributes,
-            children,
-            parent: None,
-        }
-    }
-}
-
 impl fmt::Display for Node {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fn print_node(node: &Node, f: &mut fmt::Formatter<'_>, indent: usize) -> fmt::Result {
