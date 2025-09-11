@@ -223,14 +223,20 @@ fn parse_css(input: &str) -> Stylesheet {
 }
 
 pub fn main() {
-    let args: Vec<String> = std::env::args().collect();
+    const HTML : &str = r#"
+        <html>
+            <head>
+                <title>Test Document</title>
+            </head>
+            <body>
+                <h1 class="header">Hello, World!</h1>
+                <p>This is a <a href="">link</a> in a paragraph.</p>
+            </body>
+        </html>
+    "#;
 
-    if args.len() < 2 {
-        eprintln!("Usage: {} <html_input>", args[0]);
-        return;
-    }
-
-    let parsed_tree = parse_html(args[1].as_str());
+    let dom = parse_html(HTML);
+    println!("{}", dom);
 
     const CSS: &str = r#"
         body {
@@ -250,5 +256,14 @@ pub fn main() {
     let cssom = parse_css(CSS);
     println!("{:?}", cssom);
 
-    println!("{}", parsed_tree);
+    let args: Vec<String> = std::env::args().collect();
+
+    if args.len() < 2 {
+        eprintln!("Usage: {} <html_input>", args[0]);
+        return;
+    }
+
+    let parsed_tree = parse_html(args[1].as_str());
+
+    println!("{:?}", parsed_tree);
 }
