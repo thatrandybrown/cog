@@ -57,6 +57,24 @@ impl fmt::Display for Node {
     }
 }
 
+impl fmt::Display for Stylesheet {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for rule in &self.rules {
+            write!(f, "{}:\t", rule.selector)?;
+            write!(f, " [")?;
+            for (i, (key, value)) in rule.declarations.iter().enumerate() {
+                if i > 0 {
+                    write!(f, ", ")?;
+                }
+                write!(f, "{}=\"{}\"", key, value)?;
+            }
+            write!(f, "]")?;
+            writeln!(f)?;
+        }
+        Ok(())
+    }
+}
+
 fn parse_attribute(chars: &mut std::iter::Peekable<std::str::Chars>) -> (String, String) {
     let mut key = String::new();
     let mut value = String::new();
@@ -254,7 +272,7 @@ pub fn main() {
     "#;
 
     let cssom = parse_css(CSS);
-    println!("{:?}", cssom);
+    println!("{}", cssom);
 
     let args: Vec<String> = std::env::args().collect();
 
