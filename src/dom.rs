@@ -10,7 +10,7 @@ struct Stylesheet {
 
 #[derive(Debug)]
 struct Rule {
-    selector: String,
+    selector: Vec<String>,
     declarations: Vec<(String, String)>, // Vec<Declaration>,
 }
 
@@ -60,7 +60,7 @@ impl fmt::Display for Node {
 impl fmt::Display for Stylesheet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for rule in &self.rules {
-            write!(f, "{}:\t", rule.selector)?;
+            write!(f, "{}:\t", rule.selector.join(" "))?;
             write!(f, " [")?;
             for (i, (key, value)) in rule.declarations.iter().enumerate() {
                 if i > 0 {
@@ -230,7 +230,7 @@ fn parse_css(input: &str) -> Stylesheet {
                     (key, value)
                 })
                 .collect();
-            rules.push(Rule { selector: selector.clone().trim().to_string(), declarations });
+            rules.push(Rule { selector: vec![selector.clone().trim().to_string()], declarations });
             selector.clear();
         } else {
             selector.push(c);
@@ -268,6 +268,10 @@ pub fn main() {
 
         p {
             line-height: 1.5;
+        }
+        body .header {
+            font-size: 24px;
+            font-weight: bold;
         }
     "#;
 
