@@ -230,7 +230,7 @@ fn parse_css(input: &str) -> Stylesheet {
                     (key, value)
                 })
                 .collect();
-            rules.push(Rule { selector: vec![selector.clone().trim().to_string()], declarations });
+            rules.push(Rule { selector: selector.clone().trim().split_whitespace().map(|s| s.to_string()).collect(), declarations });
             selector.clear();
         } else {
             selector.push(c);
