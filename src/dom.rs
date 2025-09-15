@@ -60,7 +60,14 @@ impl fmt::Display for Node {
 impl fmt::Display for Stylesheet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for rule in &self.rules {
-            write!(f, "{}:\t", rule.selector.join(" "))?;
+            for (i, selector_part) in rule.selector.iter().enumerate() {
+                if i > 0 {
+                    writeln!(f)?;
+                    write!(f, "{}", "  ".repeat(i))?;
+                }
+                write!(f, "{}", selector_part)?;
+            }
+            write!(f, ":\t")?;
             write!(f, " [")?;
             for (i, (key, value)) in rule.declarations.iter().enumerate() {
                 if i > 0 {
