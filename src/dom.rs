@@ -237,7 +237,7 @@ fn parse_css(input: &str) -> Stylesheet {
                     (key, value)
                 })
                 .collect();
-            rules.push(Rule { selector: selector.clone().trim().split_whitespace().map(|s| s.to_string()).collect(), declarations });
+            rules.push(Rule { selector: selector.clone().trim().split(",").map(|s| s.trim().to_string()).collect(), declarations });
             selector.clear();
         } else {
             selector.push(c);
@@ -276,7 +276,7 @@ pub fn main() {
         p {
             line-height: 1.5;
         }
-        body .header {
+        body .header, h1{
             font-size: 24px;
             font-weight: bold;
         }
