@@ -61,8 +61,15 @@ impl fmt::Display for Stylesheet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for rule in &self.rules {
             for selector_part in &rule.selector {
-                write!(f, "{}", selector_part)?;
-                write!(f, ":\t")?;
+                // Split selector by spaces to show hierarchy
+                let parts: Vec<&str> = selector_part.split_whitespace().collect();
+                for (i, part) in parts.iter().enumerate() {
+                    let indent = "  ".repeat(i);
+                    write!(f, "{}{}:", indent, part)?;
+                    if i < parts.len() - 1 {
+                        writeln!(f)?;
+                    }
+                }
                 write!(f, " [")?;
                 for (i, (key, value)) in rule.declarations.iter().enumerate() {
                     if i > 0 {
