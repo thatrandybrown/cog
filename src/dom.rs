@@ -295,6 +295,8 @@ pub fn main() {
         return;
     }
 
+    let text = args.contains(&"--text".to_string());
+
     let input_html = args.iter()
       .skip(1)
       .find(|arg| !arg.starts_with("--"))
