@@ -250,6 +250,19 @@ fn parse_css(input: &str) -> Stylesheet {
     Stylesheet { rules }
 }
 
+fn print_text_nodes(node: &Node) {
+    if node.tag.is_none() {
+        for (key, value) in &node.attributes {
+            if key == "value" {
+                println!("{}", value);
+            }
+        }
+    }
+    for child in &node.children {
+        print_text_nodes(&child.borrow());
+    }
+}
+
 pub fn main() {
     const HTML : &str = r#"
         <html>
