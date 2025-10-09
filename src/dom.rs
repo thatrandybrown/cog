@@ -295,7 +295,13 @@ pub fn main() {
         return;
     }
 
-    let parsed_tree = parse_html(args[1].as_str());
+    let input_html = args.iter()
+      .skip(1)
+      .find(|arg| !arg.starts_with("--"))
+      .map(|s| s.as_str())
+      .unwrap_or("");
+
+    let parsed_tree = parse_html(input_html);
 
     println!("{:?}", parsed_tree);
 }
