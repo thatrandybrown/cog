@@ -291,7 +291,7 @@ pub fn main() {
     let args: Vec<String> = std::env::args().collect();
 
     if args.len() < 2 {
-        eprintln!("Usage: {} <html_input>", args[0]);
+        eprintln!("Usage: {} [--flags] <html_input>", args[0]);
         return;
     }
 
