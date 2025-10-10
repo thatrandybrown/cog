@@ -254,7 +254,7 @@ fn print_text_nodes(node: &Node) {
     if node.tag.is_none() {
         for (key, value) in &node.attributes {
             if key == "value" {
-                println!("{}", value);
+                print!("{} ", value);
             }
         }
     }
