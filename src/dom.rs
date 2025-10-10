@@ -318,5 +318,11 @@ pub fn main() {
 
     let parsed_tree = parse_html(input_html);
 
+    // if --text, print only text nodes
+    if text {
+        print_text_nodes(&dom);
+        return;
+    }
+
     println!("{:?}", parsed_tree);
 }
