@@ -261,6 +261,11 @@ fn print_text_nodes(node: &Node) {
     for child in &node.children {
         print_text_nodes(&child.borrow());
     }
+    if let Some(tag) = &node.tag {
+        if ["div", "p", "h1", "h2", "h3", "h4", "h5", "h6", "li", "ul", "ol", "section", "article", "header", "footer", "nav", "head", "title"].contains(&tag.as_str()) {
+            print!("\n");
+        }
+    }
 }
 
 pub fn main() {
