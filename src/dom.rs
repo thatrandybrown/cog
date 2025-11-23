@@ -325,7 +325,7 @@ pub fn main() {
 
     // if --text, print only text nodes
     if text {
-        print_text_nodes(&dom);
+        print_text_nodes(&parsed_tree);
         return;
     }
 
