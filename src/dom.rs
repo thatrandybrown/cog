@@ -1,5 +1,5 @@
-use std::rc::{Rc, Weak};
 use std::cell::RefCell;
+use std::rc::{Rc, Weak};
 
 use std::fmt;
 
@@ -132,7 +132,17 @@ fn parse_html(input: &str) -> Node {
     while let Some(c) = chars.next() {
         if c == '<' {
             if !text_content.trim().is_empty() {
-                current.as_ref().unwrap().borrow_mut().children.push(Rc::new(RefCell::new(Node { tag: None, attributes: vec![("value".to_string(), text_content.trim().to_string())], children: vec![], parent: None })));
+                current
+                    .as_ref()
+                    .unwrap()
+                    .borrow_mut()
+                    .children
+                    .push(Rc::new(RefCell::new(Node {
+                        tag: None,
+                        attributes: vec![("value".to_string(), text_content.trim().to_string())],
+                        children: vec![],
+                        parent: None,
+                    })));
                 text_content.clear();
             }
 
@@ -149,7 +159,10 @@ fn parse_html(input: &str) -> Node {
             if tag.starts_with('/') {
                 // closing tag - move up to parent
                 if let Some(current_node) = &current {
-                    let parent_rc = current_node.borrow().parent.as_ref()
+                    let parent_rc = current_node
+                        .borrow()
+                        .parent
+                        .as_ref()
                         .and_then(|parent_weak| parent_weak.upgrade());
 
                     if let Some(parent) = parent_rc {
@@ -181,7 +194,12 @@ fn parse_html(input: &str) -> Node {
                 attributes.push((key, value));
             }
 
-            let node = Node { tag: Some(tag), attributes, children: vec![], parent: None };
+            let node = Node {
+                tag: Some(tag),
+                attributes,
+                children: vec![],
+                parent: None,
+            };
             let child = Rc::new(RefCell::new(node));
             // if root is not initialized, initialize it
             if root.is_none() {
@@ -190,7 +208,12 @@ fn parse_html(input: &str) -> Node {
             } else {
                 child.borrow_mut().parent = Some(Rc::downgrade(current.as_ref().unwrap()));
                 // child.borrow_mut().parent = Some(Rc::downgrade(&root));
-                current.as_ref().unwrap().borrow_mut().children.push(child.clone());
+                current
+                    .as_ref()
+                    .unwrap()
+                    .borrow_mut()
+                    .children
+                    .push(child.clone());
                 current = Some(child);
             }
         } else {
@@ -199,7 +222,17 @@ fn parse_html(input: &str) -> Node {
     }
 
     if !text_content.trim().is_empty() {
-        current.as_ref().unwrap().borrow_mut().children.push(Rc::new(RefCell::new(Node { tag: None, attributes: vec![("value".to_string(), text_content.trim().to_string())], children: vec![], parent: None })));
+        current
+            .as_ref()
+            .unwrap()
+            .borrow_mut()
+            .children
+            .push(Rc::new(RefCell::new(Node {
+                tag: None,
+                attributes: vec![("value".to_string(), text_content.trim().to_string())],
+                children: vec![],
+                parent: None,
+            })));
     }
 
     drop(current); // Drop current to avoid holding onto the last node
@@ -207,7 +240,12 @@ fn parse_html(input: &str) -> Node {
         Some(rc_node) => Rc::try_unwrap(rc_node)
             .expect("Failed to unwrap Rc")
             .into_inner(),
-        None => Node { tag: None, attributes: vec![], children: vec![], parent: None }
+        None => Node {
+            tag: None,
+            attributes: vec![],
+            children: vec![],
+            parent: None,
+        },
     }
 }
 
@@ -230,7 +268,8 @@ fn parse_css(input: &str) -> Stylesheet {
                 declaration.push(chars.next().unwrap());
             }
             // split declaration into list of declarations split at ';'
-            let declarations: Vec<(String, String)> = declaration.split(';')
+            let declarations: Vec<(String, String)> = declaration
+                .split(';')
                 .map(|s| s.trim().to_string())
                 .filter(|s| !s.is_empty())
                 .map(|s| {
@@ -240,7 +279,15 @@ fn parse_css(input: &str) -> Stylesheet {
                     (key, value)
                 })
                 .collect();
-            rules.push(Rule { selector: selector.clone().trim().split(",").map(|s| s.trim().to_string()).collect(), declarations });
+            rules.push(Rule {
+                selector: selector
+                    .clone()
+                    .trim()
+                    .split(",")
+                    .map(|s| s.trim().to_string())
+                    .collect(),
+                declarations,
+            });
             selector.clear();
         } else {
             selector.push(c);
@@ -262,14 +309,19 @@ fn print_text_nodes(node: &Node) {
         print_text_nodes(&child.borrow());
     }
     if let Some(tag) = &node.tag {
-        if ["div", "p", "h1", "h2", "h3", "h4", "h5", "h6", "li", "ul", "ol", "section", "article", "header", "footer", "nav", "head", "title"].contains(&tag.as_str()) {
+        if [
+            "div", "p", "h1", "h2", "h3", "h4", "h5", "h6", "li", "ul", "ol", "section", "article",
+            "header", "footer", "nav", "head", "title",
+        ]
+        .contains(&tag.as_str())
+        {
             print!("\n");
         }
     }
 }
 
 pub fn main() {
-    const HTML : &str = r#"
+    const HTML: &str = r#"
         <html>
             <head>
                 <title>Test Document</title>
@@ -315,11 +367,12 @@ pub fn main() {
 
     let text = args.contains(&"--text".to_string());
 
-    let input_html = args.iter()
-      .skip(1)
-      .find(|arg| !arg.starts_with("--"))
-      .map(|s| s.as_str())
-      .unwrap_or("");
+    let input_html = args
+        .iter()
+        .skip(1)
+        .find(|arg| !arg.starts_with("--"))
+        .map(|s| s.as_str())
+        .unwrap_or("");
 
     let parsed_tree = parse_html(input_html);
 
