@@ -327,7 +327,7 @@ pub fn main() {
     if text {
         print_text_nodes(&parsed_tree);
         return;
+    } else {
+        println!("{:?}", parsed_tree);
     }
-
-    println!("{:?}", parsed_tree);
 }
