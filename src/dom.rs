@@ -334,7 +334,7 @@ pub fn main() {
     "#;
 
     let dom = parse_html(HTML);
-    println!("{}", dom);
+    // println!("{}", dom);
 
     const CSS: &str = r#"
         body {
@@ -356,7 +356,7 @@ pub fn main() {
     "#;
 
     let cssom = parse_css(CSS);
-    println!("{}", cssom);
+    // println!("{}", cssom);
 
     let args: Vec<String> = std::env::args().collect();
 
