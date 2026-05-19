@@ -132,17 +132,19 @@ fn parse_html(input: &str) -> Node {
     while let Some(c) = chars.next() {
         if c == '<' {
             if !text_content.trim().is_empty() {
+                let text_node = Rc::new(RefCell::new(Node {
+                    tag: None,
+                    attributes: vec![("value".to_string(), text_content.trim().to_string())],
+                    children: vec![],
+                    parent: None,
+                }));
+                text_node.borrow_mut().parent = Some(Rc::downgrade(current.as_ref().unwrap()));
                 current
                     .as_ref()
                     .unwrap()
                     .borrow_mut()
                     .children
-                    .push(Rc::new(RefCell::new(Node {
-                        tag: None,
-                        attributes: vec![("value".to_string(), text_content.trim().to_string())],
-                        children: vec![],
-                        parent: None,
-                    })));
+                    .push(text_node);
                 text_content.clear();
             }
 
@@ -222,17 +224,19 @@ fn parse_html(input: &str) -> Node {
     }
 
     if !text_content.trim().is_empty() {
+        let text_node = Rc::new(RefCell::new(Node {
+            tag: None,
+            attributes: vec![("value".to_string(), text_content.trim().to_string())],
+            children: vec![],
+            parent: None,
+        }));
+        text_node.borrow_mut().parent = Some(Rc::downgrade(current.as_ref().unwrap()));
         current
             .as_ref()
             .unwrap()
             .borrow_mut()
             .children
-            .push(Rc::new(RefCell::new(Node {
-                tag: None,
-                attributes: vec![("value".to_string(), text_content.trim().to_string())],
-                children: vec![],
-                parent: None,
-            })));
+            .push(text_node);
     }
 
     drop(current); // Drop current to avoid holding onto the last node
