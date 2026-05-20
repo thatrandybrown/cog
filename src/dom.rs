@@ -131,7 +131,7 @@ fn parse_html(input: &str) -> Node {
 
     while let Some(c) = chars.next() {
         if c == '<' {
-            if !text_content.trim().is_empty() {
+            if !text_content.trim().is_empty() && current.is_some() {
                 let text_node = Rc::new(RefCell::new(Node {
                     tag: None,
                     attributes: vec![("value".to_string(), text_content.trim().to_string())],
@@ -223,7 +223,7 @@ fn parse_html(input: &str) -> Node {
         }
     }
 
-    if !text_content.trim().is_empty() {
+    if !text_content.trim().is_empty() && current.is_some() {
         let text_node = Rc::new(RefCell::new(Node {
             tag: None,
             attributes: vec![("value".to_string(), text_content.trim().to_string())],
