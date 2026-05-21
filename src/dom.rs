@@ -197,12 +197,16 @@ fn parse_html(input: &str) -> Node {
             }
 
             let node = Node {
-                tag: Some(tag),
+                tag: Some(tag.clone()),
                 attributes,
                 children: vec![],
                 parent: None,
             };
             let child = Rc::new(RefCell::new(node));
+
+            let self_closing_tags = ["br", "hr", "img", "input", "meta", "link", "area", "base", "col", "embed", "source", "track", "wbr"];
+            let is_self_closing = self_closing_tags.contains(&tag.as_str());
+
             // if root is not initialized, initialize it
             if root.is_none() {
                 root = Some(child);
@@ -216,7 +220,10 @@ fn parse_html(input: &str) -> Node {
                     .borrow_mut()
                     .children
                     .push(child.clone());
-                current = Some(child);
+                // Only set current to the child if it's not self-closing
+                if !is_self_closing {
+                    current = Some(child);
+                }
             }
         } else {
             text_content.push(c);
