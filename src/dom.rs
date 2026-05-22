@@ -159,16 +159,23 @@ fn parse_html(input: &str) -> Node {
             }
 
             if tag.starts_with('/') {
-                // closing tag - move up to parent
-                if let Some(current_node) = &current {
-                    let parent_rc = current_node
-                        .borrow()
-                        .parent
-                        .as_ref()
-                        .and_then(|parent_weak| parent_weak.upgrade());
+                // closing tag - extract tag name (remove leading '/')
+                let closing_tag_name = tag[1..].to_string();
 
-                    if let Some(parent) = parent_rc {
-                        current = Some(parent);
+                if let Some(current_node) = &current {
+                    let current_tag = current_node.borrow().tag.clone();
+
+                    // Only move to parent if tags match (lenient mode - skip mismatched)
+                    if current_tag.as_ref() == Some(&closing_tag_name) {
+                        let parent_rc = current_node
+                            .borrow()
+                            .parent
+                            .as_ref()
+                            .and_then(|parent_weak| parent_weak.upgrade());
+
+                        if let Some(parent) = parent_rc {
+                            current = Some(parent);
+                        }
                     }
                 }
                 // consume to the end of the tag
