@@ -176,6 +176,22 @@ fn parse_html(input: &str) -> Node {
                         if let Some(parent) = parent_rc {
                             current = Some(parent);
                         }
+                    } else {
+                        // Small recovery step: if parent matches, auto-close one unclosed node.
+                        let parent_rc = current_node
+                            .borrow()
+                            .parent
+                            .as_ref()
+                            .and_then(|parent_weak| parent_weak.upgrade());
+                        if let Some(parent) = parent_rc {
+                            if parent.borrow().tag.as_ref() == Some(&closing_tag_name) {
+                                current = parent
+                                    .borrow()
+                                    .parent
+                                    .as_ref()
+                                    .and_then(|parent_weak| parent_weak.upgrade());
+                            }
+                        }
                     }
                 }
                 // consume to the end of the tag
