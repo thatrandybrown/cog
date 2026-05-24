@@ -177,19 +177,22 @@ fn parse_html(input: &str) -> Node {
                             current = Some(parent);
                         }
                     } else {
-                        // Small recovery step: if parent matches, auto-close one unclosed node.
-                        let parent_rc = current_node
-                            .borrow()
-                            .parent
-                            .as_ref()
-                            .and_then(|parent_weak| parent_weak.upgrade());
-                        if let Some(parent) = parent_rc {
-                            if parent.borrow().tag.as_ref() == Some(&closing_tag_name) {
-                                current = parent
-                                    .borrow()
-                                    .parent
-                                    .as_ref()
-                                    .and_then(|parent_weak| parent_weak.upgrade());
+                        // Start recovery search from the current node using a separate pointer.
+                        let mut search_node = Some(current_node.clone());
+                        if let Some(node) = search_node.take() {
+                            let parent_rc = node
+                                .borrow()
+                                .parent
+                                .as_ref()
+                                .and_then(|parent_weak| parent_weak.upgrade());
+                            if let Some(parent) = parent_rc {
+                                if parent.borrow().tag.as_ref() == Some(&closing_tag_name) {
+                                    current = parent
+                                        .borrow()
+                                        .parent
+                                        .as_ref()
+                                        .and_then(|parent_weak| parent_weak.upgrade());
+                                }
                             }
                         }
                     }
