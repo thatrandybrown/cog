@@ -179,21 +179,20 @@ fn parse_html(input: &str) -> Node {
                     } else {
                         // Start recovery search from the current node using a separate pointer.
                         let mut search_node = Some(current_node.clone());
-                        if let Some(node) = search_node.take() {
-                            let parent_rc = node
+                        while let Some(node) = search_node {
+                            if node.borrow().tag.as_ref() == Some(&closing_tag_name) {
+                                current = node
+                                    .borrow()
+                                    .parent
+                                    .as_ref()
+                                    .and_then(|parent_weak| parent_weak.upgrade());
+                                break;
+                            }
+                            search_node = node
                                 .borrow()
                                 .parent
                                 .as_ref()
                                 .and_then(|parent_weak| parent_weak.upgrade());
-                            if let Some(parent) = parent_rc {
-                                if parent.borrow().tag.as_ref() == Some(&closing_tag_name) {
-                                    current = parent
-                                        .borrow()
-                                        .parent
-                                        .as_ref()
-                                        .and_then(|parent_weak| parent_weak.upgrade());
-                                }
-                            }
                         }
                     }
                 }
