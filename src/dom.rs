@@ -158,6 +158,12 @@ fn parse_html(input: &str) -> Node {
                 tag.push(chars.next().unwrap());
             }
 
+            let mut explicit_self_closing = false;
+            if tag.ends_with('/') {
+                tag.pop();
+                explicit_self_closing = true;
+            }
+
             if tag.starts_with('/') {
                 // closing tag - extract tag name (remove leading '/')
                 let closing_tag_name = tag[1..].to_string();
@@ -230,7 +236,7 @@ fn parse_html(input: &str) -> Node {
             let child = Rc::new(RefCell::new(node));
 
             let self_closing_tags = ["br", "hr", "img", "input", "meta", "link", "area", "base", "col", "embed", "source", "track", "wbr"];
-            let is_self_closing = self_closing_tags.contains(&tag.as_str());
+            let is_self_closing = explicit_self_closing || self_closing_tags.contains(&tag.as_str());
 
             // if root is not initialized, initialize it
             if root.is_none() {
