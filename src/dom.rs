@@ -215,6 +215,15 @@ fn parse_html(input: &str) -> Node {
 
             let mut attributes = vec![];
             while let Some(&next_c) = chars.peek() {
+                if next_c == '/' {
+                    chars.next();
+                    if let Some('>') = chars.peek() {
+                        explicit_self_closing = true;
+                        chars.next();
+                        break;
+                    }
+                    continue;
+                }
                 if next_c == '>' {
                     chars.next();
                     break;
@@ -369,6 +378,7 @@ pub fn main() {
                 <title>Test Document</title>
             </head>
             <body>
+                <img src="image.jpg" alt="Test Image" />
                 <h1 class="header">Hello, World!</h1>
                 <p>This is a <a href="">link</a> in a paragraph.</p>
             </body>
