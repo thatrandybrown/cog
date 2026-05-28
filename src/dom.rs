@@ -131,20 +131,17 @@ fn parse_html(input: &str) -> Node {
 
     while let Some(c) = chars.next() {
         if c == '<' {
-            if !text_content.trim().is_empty() && current.is_some() {
-                let text_node = Rc::new(RefCell::new(Node {
-                    tag: None,
-                    attributes: vec![("value".to_string(), text_content.trim().to_string())],
-                    children: vec![],
-                    parent: None,
-                }));
-                text_node.borrow_mut().parent = Some(Rc::downgrade(current.as_ref().unwrap()));
-                current
-                    .as_ref()
-                    .unwrap()
-                    .borrow_mut()
-                    .children
-                    .push(text_node);
+            if !text_content.trim().is_empty() {
+                if let Some(current_node) = &current {
+                    let text_node = Rc::new(RefCell::new(Node {
+                        tag: None,
+                        attributes: vec![("value".to_string(), text_content.trim().to_string())],
+                        children: vec![],
+                        parent: None,
+                    }));
+                    text_node.borrow_mut().parent = Some(Rc::downgrade(current_node));
+                    current_node.borrow_mut().children.push(text_node);
+                }
                 text_content.clear();
             }
 
