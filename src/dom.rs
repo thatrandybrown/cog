@@ -14,11 +14,6 @@ struct Rule {
     declarations: Vec<(String, String)>, // Vec<Declaration>,
 }
 
-struct Declaration {
-    property: String,
-    value: String,
-}
-
 #[derive(Debug)]
 struct Node {
     tag: Option<String>,
